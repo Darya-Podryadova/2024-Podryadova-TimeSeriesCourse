@@ -89,41 +89,41 @@ class TimeSeriesHierarchicalClustering:
         return self.labels_
 
 
-    def _draw_timeseries_allclust(self, dx: pd.DataFrame, labels: np.ndarray, leaves: list[int], gs: gridspec.GridSpec, ts_hspace: int) -> None:
-        """ 
-        Plot time series graphs beside dendrogram
+    # def _draw_timeseries_allclust(self, dx: pd.DataFrame, labels: np.ndarray, leaves: list[int], gs: gridspec.GridSpec, ts_hspace: int) -> None:
+    #     """ 
+    #     Plot time series graphs beside dendrogram
 
-        Parameters
-        ----------
-        dx: timeseries data with column "y" indicating cluster number
-        labels: labels of dataset's instances
-        leaves: leave node names from scipy dendrogram
-        gs: gridspec configurations
-        ts_hspace: horizontal space in gridspec for plotting time series
-        """
+    #     Parameters
+    #     ----------
+    #     dx: timeseries data with column "y" indicating cluster number
+    #     labels: labels of dataset's instances
+    #     leaves: leave node names from scipy dendrogram
+    #     gs: gridspec configurations
+    #     ts_hspace: horizontal space in gridspec for plotting time series
+    #     """
 
-        prop_cycle = plt.rcParams['axes.prop_cycle']
-        colors = prop_cycle.by_key()['color']
-        margin = 7
+    #     prop_cycle = plt.rcParams['axes.prop_cycle']
+    #     colors = prop_cycle.by_key()['color']
+    #     margin = 7
 
-        max_cluster = len(leaves)
-        # flip leaves, as gridspec iterates from top down
-        leaves = leaves[::-1]
+    #     max_cluster = len(leaves)
+    #     # flip leaves, as gridspec iterates from top down
+    #     leaves = leaves[::-1]
 
-        for cnt in range(len(leaves)):
-            plt.subplot(gs[cnt:cnt+1, max_cluster-ts_hspace:max_cluster])
-            plt.axis("off")
+    #     for cnt in range(len(leaves)):
+    #         plt.subplot(gs[cnt:cnt+1, max_cluster-ts_hspace:max_cluster])
+    #         plt.axis("off")
 
-            # get leafnode name, which corresponds to original data index
-            leafnode = leaves[cnt]
-            ts = dx[leafnode]
-            ts_len = ts.shape[0] - 1
+    #         # get leafnode name, which corresponds to original data index
+    #         leafnode = leaves[cnt]
+    #         ts = dx[leafnode]
+    #         ts_len = ts.shape[0] - 1
 
-            label = int(labels[leafnode])
-            color_ts = colors[label]
+    #         label = int(labels[leafnode])
+    #         color_ts = colors[label]
 
-            plt.plot(ts, color=color_ts)
-            plt.text(ts_len+margin, 0, f'class = {label}')
+    #         plt.plot(ts, color=color_ts)
+    #         plt.text(ts_len+margin, 0, f'class = {label}')
 
 
     def plot_dendrogram(self, df: pd.DataFrame, labels: np.ndarray, ts_hspace: int = 12, title: str = 'Dendrogram') -> None:

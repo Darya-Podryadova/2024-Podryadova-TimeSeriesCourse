@@ -60,7 +60,7 @@ class PairwiseDistance:
             dist_func = DTW_distance
             return dist_func
         else:
-            raise ValueError("Unknown metric: Choose 'euclidean' or 'dtw'.")
+            raise ValueError("Неизвестная метрика: Выбери 'euclidean' или 'dtw'.")
         return dist_func
 
 
@@ -80,6 +80,7 @@ class PairwiseDistance:
         matrix_values = np.zeros(shape=matrix_shape)
         
         # INSERT YOUR CODE
+        distance_function = self._choose_distance()
         for i in range(input_data.shape[0]):
             for j in range(i, input_data.shape[0]):  
                 ts1 = input_data[i]
@@ -88,7 +89,7 @@ class PairwiseDistance:
                 if self.is_normalize:
                     ts1 = z_normalize(ts1)
                     ts2 = z_normalize(ts2)
-
+                
                 dist = distance_function(ts1, ts2)
                 matrix_values[i, j] = dist
                 matrix_values[j, i] = dist  
