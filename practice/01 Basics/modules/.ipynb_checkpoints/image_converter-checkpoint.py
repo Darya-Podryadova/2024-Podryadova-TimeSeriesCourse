@@ -4,7 +4,7 @@ import math
 import cv2
 import imutils
 # from google.colab.patches import cv2_imshow
-
+import matplotlib.pyplot as plt
 
 class Image2TimeSeries:
     """
@@ -34,6 +34,18 @@ class Image2TimeSeries:
 
         # INSERT YOUR CODE
 
+        # Преобразование в оттенки серого
+        gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        
+        # Инверсия цвета
+        inverted_img = cv2.bitwise_not(gray_img)
+        
+        # Размытие для удаления шума
+        blurred_img = cv2.GaussianBlur(inverted_img, (5, 5), 0)
+        
+        # Преобразование изображения в черное-белое
+        _, prep_img = cv2.threshold(blurred_img, 127, 255, cv2.THRESH_BINARY)
+        
         return prep_img
 
 
@@ -110,6 +122,7 @@ class Image2TimeSeries:
         -------
             coordinates of one point on the contour
         """
+        contour = contour.reshape(-1, 2)
 
         angles = np.rad2deg(np.arctan2(*(center - contour).T))
         angles = np.where(angles < -90, angles + 450, angles + 90)
@@ -163,8 +176,17 @@ class Image2TimeSeries:
                     cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 6)
         for i in range(len(edge_coordinates)):
             cv2.drawContours(img, np.array([[center, edge_coordinates[i]]]), -1, (255, 0, 255), 4)
+        resized_image = imutils.resize(img, width=200)
 
-        cv2_imshow(imutils.resize(img, width=200))
+        # Перевод цветового пространства
+        resized_image_rgb = cv2.cvtColor(resized_image, cv2.COLOR_BGR2RGB)
+        
+        # Отображение изображения
+        # cv2.imshow(imutils.resize(img, width=200))
+        cv2.imshow('Resized Image', imutils.resize(img, width=200))
+        plt.imshow(resized_image_rgb)
+        plt.axis('off')  # Убираем оси
+        plt.show()  # Показываем изображение
 
 
     def convert(self, img: np.ndarray, is_visualize: bool = False) -> np.ndarray:

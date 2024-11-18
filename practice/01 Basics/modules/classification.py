@@ -7,7 +7,7 @@ from modules.utils import z_normalize
 default_metrics_params = {'euclidean': {'normalize': True},
                          'dtw': {'normalize': True, 'r': 0.05}
                          }
-
+from typing import Optional
 class TimeSeriesKNN:
     """
     KNN Time Series Classifier
@@ -20,7 +20,7 @@ class TimeSeriesKNN:
     metric_params: dictionary containing parameters for the distance metric being used
     """
     
-    def __init__(self, n_neighbors: int = 3, metric: str = 'euclidean', metric_params: dict | None = None) -> None:
+    def __init__(self, n_neighbors: int = 3, metric: str = 'euclidean', metric_params: Optional[dict] = None) -> None:
 
         self.n_neighbors: int = n_neighbors
         self.metric: str = metric
@@ -29,7 +29,7 @@ class TimeSeriesKNN:
             self.metric_params.update(metric_params)
 
 
-    def fit(self, X_train: np.ndarray, Y_train: np.ndarray) -> Self:
+    def fit(self, X_train: np.ndarray, Y_train: np.ndarray) -> "TimeSeriesKNN":
         """
         Fit the model using X_train as training data and Y_train as labels
 
@@ -66,6 +66,14 @@ class TimeSeriesKNN:
         dist = 0
 
         # INSERT YOUR CODE
+        if self.metric == "euclidean":
+            if self.metric_params['normalize']:
+               dist = norm_ED_distance(x_train,x_test)
+        else:
+            if self.metric_params['normalize']:
+               x_train = z_normalize(x_train)
+               x_test = z_normalize(x_test)
+               dist = DTW_distance(x_train,x_test)
 
         return dist
 
@@ -87,7 +95,13 @@ class TimeSeriesKNN:
 
         # INSERT YOUR CODE
 
-        return neighbors
+        for i in range(len(self.X_train)):
+            dist = self._distance(self.X_train[i], x_test)
+            neighbors.append((dist, self.Y_train[i]))
+        neighbors.sort(key=lambda x: x[0])
+
+        return neighbors[:self.n_neighbors]  # Возвращаем только k ближайших соседей
+
 
 
     def predict(self, X_test: np.ndarray) -> np.ndarray:
@@ -106,6 +120,11 @@ class TimeSeriesKNN:
         y_pred = []
 
         # INSERT YOUR CODE
+
+        for x_test in X_test:
+            neighbors = self._find_neighbors(x_test)
+            neighbor_labels = [neighbor[1] for neighbor in neighbors]
+            y_pred.append(max(set(neighbor_labels), key=neighbor_labels.count))
 
         return np.array(y_pred)
 

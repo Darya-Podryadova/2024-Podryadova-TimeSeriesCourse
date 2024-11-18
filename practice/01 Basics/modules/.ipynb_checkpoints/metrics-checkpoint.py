@@ -44,7 +44,15 @@ def norm_ED_distance(ts1: np.ndarray, ts2: np.ndarray) -> float:
     norm_ed_dist = 0
 
     # INSERT YOUR CODE
+    if len(ts1) != len(ts2):
+        raise ValueError("The two arrays must have the same length.")
 
+    m = len(ts1)
+
+    norm_ed_dist = np.sqrt(abs(2*m * (1 - (np.dot(ts1, ts2) - m * (sum(ts1)/m) * (sum(ts2)/m)) / (
+        m * np.sqrt(sum(ts1**2 - (sum(ts1)/m)**2) / m) * np.sqrt(sum(ts2**2 - (sum(ts2)/m)**2) / m)))))
+
+    
     return norm_ed_dist
 
 
