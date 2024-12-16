@@ -155,7 +155,38 @@ class NaiveBestMatchFinder(BestMatchFinder):
         }
         
         # INSERT YOUR CODE
+        # Проходим по каждому началу подпоследовательности
+        for start in range(N):
+            if start + m <= N:  # Убедимся, что подпоследовательность помещается в временной ряд
+                subsequence = ts_data[start]  # Извлекаем текущую подпоследовательность
 
+                # Вычисляем расстояние DTW между запросом и текущей подпоследовательностью
+                distance = DTW_distance(query, subsequence)
+
+                # Обновляем профиль расстояний
+                dist_profile[start] = distance
+            # print(distance)
+        # Используем функцию topK_match для получения лучших совпадений с учетом исключающей зоны
+        topK_results = topK_match(dist_profile, excl_zone, self.topK)
+
+        # Заполняем bestmatch с индексами и расстояниями
+        bestmatch['index'] = topK_results['indices']
+        bestmatch['distance'] = topK_results['distances']
+
+        # for i in range(N):
+        #     if excl_zone is not None and abs(i - excl_zone) < len(query):
+        #         continue  # пропускаем, если в зоне исключения
+
+        #     dist = DTW_distance(ts_data[i], query) 
+
+        #     if dist < bsf:
+        #         bsf = dist
+        #         bestmatch['index'] = [i]
+        #         bestmatch['distance'] = [dist]
+        #     elif dist == bsf:
+        #         bestmatch['index'].append(i)
+        #         bestmatch['distance'].append(dist)
+        print(bestmatch['distance'])
         return bestmatch
 
 

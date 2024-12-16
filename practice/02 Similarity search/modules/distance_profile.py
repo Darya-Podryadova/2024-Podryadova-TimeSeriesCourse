@@ -27,4 +27,12 @@ def brute_force(ts: np.ndarray, query: np.ndarray, is_normalize: bool = True) ->
 
     # INSERT YOUR CODE
 
+    if is_normalize:
+        ts = z_normalize(ts)
+        query = z_normalize(query)
+
+    # Алгоритм грубой силы: вычисляем расстояние для каждого окна в ts
+    for i in range(N):
+        dist_profile[i] = ED_distance(ts[i:i + m], query)
+    
     return dist_profile

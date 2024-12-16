@@ -54,13 +54,15 @@ def _run_experiment_dist_profile(algorithm: str, data: dict, exp_params: dict, a
 
     for n in n_list:
         for m in m_list:
-            match algorithm:
-                case 'brute_force':
-                    runtime_code = f"brute_force(data['ts']['{n}'], data['query']['{m}'])"
-                case 'mass3': 
-                    runtime_code = f"mts.mass3(data['ts']['{n}'], data['query']['{m}'], alg_params['segment_len'])"
-                case 'mass' | 'mass2':
-                    runtime_code = f"mts.{algorithm}(data['ts']['{n}'], data['query']['{m}'])"    
+            if algorithm == 'brute_force':
+                runtime_code = f"brute_force(data['ts']['{n}'], data['query']['{m}'])"
+            elif algorithm == 'mass3': 
+                runtime_code = f"mts.mass3(data['ts']['{n}'], data['query']['{m}'], alg_params['segment_len'])"
+            elif algorithm in ['mass', 'mass2']:
+                runtime_code = f"mts.{algorithm}(data['ts']['{n}'], data['query']['{m}'])"
+            else:
+                times.append(np.nan) 
+                continue   
             try:
                 time = timeit.timeit(stmt=runtime_code, number=1, globals={**globals(), **locals()})
             except:
@@ -97,13 +99,16 @@ def _run_experiment_best_match(algorithm: str, data: dict, exp_params: dict, alg
         r_times = []
         for n in n_list:
             for m in m_list:
-                match algorithm:
-                    case 'naive':
-                        naive_bestmatch_model = NaiveBestMatchFinder(alg_params['excl_zone_frac'], alg_params['topK'], alg_params['normalize'], r)
-                        runtime_code = f"naive_bestmatch_model.perform(data['ts']['{n}'], data['query']['{m}'])"
-                    case 'ucr-dtw':
-                        ucr_dtw_bestmatch_model = UCR_DTW(alg_params['excl_zone_frac'], alg_params['topK'], alg_params['normalize'], r)
-                        runtime_code = f"ucr_dtw_bestmatch_model.perform(data['ts']['{n}'], data['query']['{m}'])"
+                if algorithm == 'naive':
+                    naive_bestmatch_model = NaiveBestMatchFinder(alg_params['excl_zone_frac'], alg_params['topK'], alg_params['normalize'], r)
+                    runtime_code = f"naive_bestmatch_model.perform(data['ts']['{n}'], data['query']['{m}'])"
+                elif algorithm == 'ucr-dtw':
+                    ucr_dtw_bestmatch_model = UCR_DTW(alg_params['excl_zone_frac'], alg_params['topK'], alg_params['normalize'], r)
+                    runtime_code = f"ucr_dtw_bestmatch_model.perform(data['ts']['{n}'], data['query']['{m}'])"
+                else:
+
+                    r_times.append(np.nan)
+                    continue  
 
                 try:
                     time = timeit.timeit(stmt=runtime_code, number=1, globals={**globals(), **locals()})
@@ -140,7 +145,7 @@ def run_experiment(algorithm: str, task: str, data: dict, exp_params: dict, alg_
         times = _run_experiment_best_match(algorithm, data, exp_params, alg_params)
     else:
         raise NotImplementedError
-
+    print(times)
     return times
 
 
